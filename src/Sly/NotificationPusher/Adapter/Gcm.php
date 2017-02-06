@@ -59,9 +59,9 @@ class Gcm extends BaseAdapter
      */
     public function push(PushInterface $push)
     {
-        $client        = $this->getOpenedClient();
+        $client = $this->getOpenedClient();
         $pushedDevices = new DeviceCollection();
-        $tokens        = array_chunk($push->getDevices()->getTokens(), 100);
+        $tokens = array_chunk($push->getDevices()->getTokens(), 100);
 
         foreach ($tokens as $tokensRange) {
             $message = $this->getServiceMessageFromOrigin($tokensRange, $push->getMessage());
@@ -72,7 +72,7 @@ class Gcm extends BaseAdapter
                 throw new PushException($e->getMessage());
             }
 
-            if ((bool) $this->response->getSuccessCount()) {
+            if ((bool)$this->response->getSuccessCount()) {
                 foreach ($tokensRange as $token) {
                     $pushedDevices->add($push->getDevices()->get($token));
                 }
@@ -117,12 +117,12 @@ class Gcm extends BaseAdapter
      */
     public function getServiceMessageFromOrigin(array $tokens, BaseOptionedModel $message)
     {
-        $data            = $message->getOptions();
-        $data['message'] = $message->getText();
+        $data = $message->getOptions();
+        $data['body'] = $message->getText();
 
         $serviceMessage = new ServiceMessage();
         $serviceMessage->setRegistrationIds($tokens);
-        $serviceMessage->setData($data);
+        $serviceMessage->setNotification($data);
         $serviceMessage->setCollapseKey($this->getParameter('collapseKey'));
         $serviceMessage->setRestrictedPackageName($this->getParameter('restrictedPackageName'));
         $serviceMessage->setDelayWhileIdle($this->getParameter('delayWhileIdle', false));
